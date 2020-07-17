@@ -1,17 +1,19 @@
 #pragma once
-#include "camera.h"
 #include <cstdint>
 
+#include "camera.h"
+
 struct Pixel {
-	uint8_t r, g, b, a;
+    uint8_t r, g, b, a;
 };
 
 class Renderer {
 public:
-	Renderer() {}
-	~Renderer() {}
+    Renderer() { }
+    ~Renderer() { }
 
-	void render(const Camera& camera, Pixel* data, int SCREEN_WIDTH, int SCREEN_HEIGHT);
+    void render(const Camera& camera, Pixel* data, int SCREEN_WIDTH,
+        int SCREEN_HEIGHT);
 
 private:
 };
