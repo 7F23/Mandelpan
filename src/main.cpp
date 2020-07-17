@@ -7,15 +7,21 @@
 
 constexpr int SCREEN_WIDTH = 854, SCREEN_HEIGHT = 480;
 
+void openMandelbrotWindow()
+{
+    Window mandelbrot_window(SCREEN_WIDTH, SCREEN_HEIGHT);
+    mandelbrot_window.task();
+}
+
 int main()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        fprintf(stderr, "could not initialize sdl2: %s\n", SDL_GetError());
+        std::cerr << "could not initialize sdl2:"
+                  << SDL_GetError() << std::endl;
         return 1;
     }
 
-    Window mandelbrot_window(SCREEN_WIDTH, SCREEN_HEIGHT);
-    mandelbrot_window.task();
+    openMandelbrotWindow();
 
     std::cout << "exiting Mandelpan" << std::endl;
     SDL_Quit();

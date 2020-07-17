@@ -6,7 +6,7 @@
 
 class Window {
 public:
-    Window(int SCREEN_WIDTH, int SCREEN_HEIGHT);
+    Window(int width, int height);
     ~Window();
 
     void userInput();

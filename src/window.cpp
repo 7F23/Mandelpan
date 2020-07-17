@@ -5,23 +5,29 @@
 #include <thread>
 #include <vector>
 
-constexpr int screenhz = 60;
+constexpr int SCREEN_HZ = 60;
 
-Window::Window(int SCREEN_WIDTH, int SCREEN_HEIGHT)
+Window::Window(int width, int height)
 {
     window = SDL_CreateWindow("Mandelpan", SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
-        SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        SDL_WINDOWPOS_UNDEFINED, width,
+        height, SDL_WINDOW_SHOWN);
     if (window == nullptr) {
-        fprintf(stderr, "could not create window: %s\n", SDL_GetError());
+        std::cerr << "could not create sdl2 window:"
+                  << SDL_GetError() << std::endl;
     }
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888,
-        SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH,
-        SCREEN_HEIGHT);
+        SDL_TEXTUREACCESS_STREAMING, width,
+        height);
 }
 
-Window::~Window() { SDL_DestroyWindow(window); }
+Window::~Window()
+{
+    SDL_DestroyTexture(texture);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+}
 
 void Window::userInput()
 {
@@ -60,22 +66,22 @@ void Window::userInput()
 
 void Window::render()
 {
-    int SCREEN_WIDTH, SCREEN_HEIGHT;
-    SDL_QueryTexture(texture, NULL, NULL, &SCREEN_WIDTH, &SCREEN_HEIGHT);
-    std::vector<Pixel> pixels(SCREEN_WIDTH * SCREEN_HEIGHT);
+    int width, height;
+    SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
+    std::vector<Pixel> pixels(size_t(width) * size_t(height));
 
     // render
-    r.render(camera, &pixels[0], SCREEN_WIDTH, SCREEN_HEIGHT);
+    r.render(camera, &pixels[0], width, height);
 
     // updating and blitting the texture
-    SDL_UpdateTexture(texture, NULL, &pixels[0], SCREEN_WIDTH * sizeof(Pixel));
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    SDL_UpdateTexture(texture, nullptr, &pixels[0], width * sizeof(Pixel));
+    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
 }
 
 void Window::task()
 {
-    auto time_between_two_frames = std::chrono::milliseconds(1000 / screenhz);
+    auto time_between_two_frames = std::chrono::milliseconds(1000 / SCREEN_HZ);
 
     frameCount = 0;
     while (quit == false) {
@@ -84,7 +90,7 @@ void Window::task()
         // handle user input
         userInput();
 
-        // give output in graphics
+        // render fractal
         render();
 
         auto t1 = std::chrono::system_clock::now();

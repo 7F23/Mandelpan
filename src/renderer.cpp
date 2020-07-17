@@ -4,19 +4,19 @@
 
 #include "camera.h"
 
-constexpr int maxiterations = 60;
+constexpr int MAX_ITERATIONS = 60;
 
-static std::complex<double> mandelbrotfunction(std::complex<double> c,
+static std::complex<double> mandelbrot_function(std::complex<double> c,
     std::complex<double> z)
 {
     return z * z + c;
 }
 
-static bool mandelbrotconvergence(std::complex<double> c, int& iterations)
+static bool mandelbrot_convergence(std::complex<double> c, int& iterations)
 {
     std::complex<double> z = { 0.0, 0.0 };
-    for (int i = 0; i < maxiterations; i++) {
-        z = mandelbrotfunction(c, z);
+    for (int i = 0; i < MAX_ITERATIONS; i++) {
+        z = mandelbrot_function(c, z);
         if (std::abs(z) > 2) {
             iterations = i;
             return false;
@@ -25,7 +25,7 @@ static bool mandelbrotconvergence(std::complex<double> c, int& iterations)
     return true;
 }
 
-static std::complex<double> pixeltocomplex(const Camera& camera, int w, int h,
+static std::complex<double> pixel_to_complex(const Camera& camera, int w, int h,
     int x, int y)
 {
     double ratio = (double)w / h;
@@ -38,14 +38,14 @@ static std::complex<double> pixeltocomplex(const Camera& camera, int w, int h,
         (ry + camera.getVertical()) / camera.getZoom() };
 }
 
-void Renderer::render(const Camera& camera, Pixel* data, int SCREEN_WIDTH,
-    int SCREEN_HEIGHT)
+void Renderer::render(const Camera& camera, Pixel* data, int width,
+    int height)
 {
-    for (int y = 0; y < SCREEN_HEIGHT; y++) {
-        for (int x = 0; x < SCREEN_WIDTH; x++) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
             int iter = 0;
-            auto c = pixeltocomplex(camera, SCREEN_WIDTH, SCREEN_HEIGHT, x, y);
-            bool convergence = mandelbrotconvergence(c, iter);
+            auto c = pixel_to_complex(camera, width, height, x, y);
+            bool convergence = mandelbrot_convergence(c, iter);
             Pixel pixel;
             if (convergence == true) {
                 pixel = Pixel { 0, 0, 0, 255 };
@@ -53,7 +53,7 @@ void Renderer::render(const Camera& camera, Pixel* data, int SCREEN_WIDTH,
                 uint8_t color = 255 - iter * 4;
                 pixel = Pixel { color, color, color, 255 };
             }
-            data[y * SCREEN_WIDTH + x] = pixel;
+            data[y * width + x] = pixel;
         }
     }
 }

@@ -12,8 +12,5 @@ public:
     Renderer() { }
     ~Renderer() { }
 
-    void render(const Camera& camera, Pixel* data, int SCREEN_WIDTH,
-        int SCREEN_HEIGHT);
-
-private:
+    void render(const Camera& camera, Pixel* data, int width, int height);
 };
